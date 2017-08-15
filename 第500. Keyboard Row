@@ -1,0 +1,43 @@
+Given a List of words, return the words that can be typed using letters of 
+alphabet on only one row's of American keyboard like the image below.
+Example 1:
+Input: ["Hello", "Alaska", "Dad", "Peace"]
+Output: ["Alaska", "Dad"]
+题意就是说，给的单词，如果某个单词的字母都是键盘上的一行，就是对的
+思路:一开始我觉得还挺简单，但后来想想还是十分的麻烦，然后就看了答案，第一种方法很巧妙，但是效率不高。
+第二种利用hashmap，因为键盘上的字母一共有3行hashmap<Character, Integer>，一开始每个字母对手自己的行数,Integer是行数
+然后对于每一个String,首先得出其第一个字母的行数，然后往后遍历后面的字母，如果对应行数不对，则不添加。嗯，这种思路挺好的。而且非常快
+
+代码:
+public class Solution {
+    public String[] findWords(String[] words) {
+         return Stream.of(words).filter(s -> s.toLowerCase().matches("[qwertyuiop]*|[asdfghjkl]*|[zxcvbnm]*")).toArray(String[]::new);
+    }
+    
+}
+第二种思路的代码:
+public class Solution {
+    public String[] findWords(String[] words) {
+         String[] strs = {"QWERTYUIOP","ASDFGHJKL","ZXCVBNM"};
+        Map<Character, Integer> map = new HashMap<>();
+        for(int i = 0; i<strs.length; i++){
+            for(char c: strs[i].toCharArray()){
+                map.put(c, i);//put <char, rowIndex> pair into the map
+            }
+        }
+        List<String> res = new LinkedList<>();
+        for(String w: words){
+            if(w.equals("")) continue;
+            int index = map.get(w.toUpperCase().charAt(0));
+            for(char c: w.toUpperCase().toCharArray()){
+                if(map.get(c)!=index){
+                    index = -1; //don't need a boolean flag. 
+                    break;
+                }
+            }
+            if(index!=-1) res.add(w);//if index != -1, this is a valid string
+        }
+        return res.toArray(new String[0]);
+    }
+    
+}
