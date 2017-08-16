@@ -1,0 +1,94 @@
+The set S originally contains numbers from 1 to n. But unfortunately, due to the data error, one of 
+the numbers in the set got duplicated to another number in the set, which results in repetition of one number and loss of another number.
+
+Given an array nums representing the data status of this set after the error. Your task is to firstly 
+find the number occurs twice and then find the number that is missing. Return them in the form of an array.
+
+Example 1:
+Input: nums = [1,2,2,4]
+Output: [2,3]
+
+这道题用了最笨的方法
+代码:
+public class Solution {
+    public int[] findErrorNums(int[] nums) {
+        HashSet<Integer> set = new HashSet<Integer>();
+        int[] result = new int[2];
+        Arrays.sort(nums);
+        for(int i = 0; i < nums.length; i++){
+            System.out.println(nums[i]);
+        }
+        
+        int panduan = 0;
+        for(int i = 0; i < nums.length; i++){
+            if(i > 0 && nums[i] == nums[i-1]){
+                result[0] = nums[i];
+            }       
+            set.add(nums[i]);
+        }
+        for(int i = 0; i < nums.length; i++){
+            if(!set.contains(i+1)){
+                result[1] = i + 1;
+                break;
+            }           
+        }
+        return result;
+        
+    }
+}
+稍微改进了一下，但是还是没有快多少:
+public class Solution {
+    public int[] findErrorNums(int[] nums) {
+        HashSet<Integer> set = new HashSet<Integer>();
+        int[] result = new int[2];
+        Arrays.sort(nums);
+        for(int i = 0; i < nums.length; i++){
+            System.out.println(nums[i]);
+        }
+        
+        if(nums[0] == 1){
+            int panduan = 0;
+            int jiezhi = 0;
+            for(int i = 1; i < nums.length; i++){
+                if(jiezhi == 2){
+                    break;
+                }
+                if(nums[i] == nums[i-1]){
+                    result[0] = nums[i];
+                    jiezhi++;
+                }
+                if(nums[i] - nums[i-1] > 1){
+                    result[1] = nums[i]-1;
+                    panduan = 1;
+                    jiezhi++;
+                }
+            }
+            if(panduan == 0){
+                result[1] = nums.length;
+            }
+            
+        }else{
+            result[1] = 1;
+            for(int i = 1; i < nums.length; i++){
+                if(nums[i] == nums[i-1]){
+                    result[0] = nums[i];
+                    break;
+                }
+            }
+        }
+        return result;
+        
+    }
+}
+别人的解法
+public int[] findErrorNums(int[] nums) {
+    Set<Integer> set = new HashSet<>();
+    int duplicate = 0, n = nums.length;
+    long sum = (n * (n+1)) / 2;
+    for(int i : nums) {
+        if(set.contains(i)) duplicate = i;
+        sum -= i;
+        set.add(i);
+    }
+    return new int[] {duplicate, (int)sum + duplicate};
+}
