@@ -1,0 +1,68 @@
+Given a non-empty array of integers, return the k most frequent elements.
+
+For example,
+Given [1,1,1,2,2,3] and k = 2, return [1,2].
+
+Note: 
+You may assume k is always valid, 1 ≤ k ≤ number of unique elements.
+Your algorithm's time complexity must be better than O(n log n), where n is the array's size.
+
+思路：这道题我用了最笨的方法，先排序，然后找到每个数字的连续的终点，因为这样总比每循环依次判断map.contains要快。
+把每个数字及其个数存入map中，然后将map加入一个list中，写compare()函数来将map排序。在依次取出key值，.getKey()存入result list中。
+很快，94.46%
+代码：
+class Solution {
+    public List<Integer> topKFrequent(int[] nums, int k) {
+        List<Integer> result = new ArrayList<Integer>();
+        if(nums == null || nums.length == 0){
+            return result;
+        }
+        if(nums.length == 1){
+            result.add(nums[0]);
+            return result;
+        }
+        Arrays.sort(nums);
+        int count = 1;
+        HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
+        for(int i = 1; i < nums.length; i++){
+            if(i != nums.length - 1){
+                if(nums[i] == nums[i - 1]){
+                    count++;
+                }else{
+                    map.put(nums[i - 1], count);
+                    count = 1;//重置
+                }
+            }else{//最后
+                if(nums[i] == nums[i - 1]){//最后一个数字非独一
+                    count++;
+                    map.put(nums[i], count);
+                }else{//最后一个数字是独一的
+                    map.put(nums[i - 1], count);
+                    map.put(nums[i], 1);
+                }
+            }
+        }
+        List<Map.Entry<Integer,Integer>> list=new ArrayList<>();
+        list.addAll(map.entrySet());
+        Collections.sort(list, new ValueComparator());
+        count = 1;
+        for(Iterator<Map.Entry<Integer,Integer>> it=list.iterator();it.hasNext();)  
+        {
+            if(count > k){
+                break;
+            }
+            //result.add(it.next().getKey());
+            result.add(it.next().getKey());
+            count++;
+            //System.out.println(it.next().getKey());  
+        } 
+        return result;
+    }
+    private static class ValueComparator implements Comparator<Map.Entry<Integer,Integer>>  
+    {  
+        public int compare(Map.Entry<Integer,Integer> m,Map.Entry<Integer,Integer> n)  
+        {  
+            return n.getValue()-m.getValue();  
+        }  
+    }
+}
